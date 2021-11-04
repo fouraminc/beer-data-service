@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
@@ -12,12 +14,21 @@ import (
 type App struct {
 
 	Router *mux.Router
+	DB *sql.DB
 	Logger *log.Logger
 }
 
-func (a *App) Initialize() {
+func (a *App) Initialize(user, password, dbname, host, port string) {
 
 	a.Logger = log.New(os.Stdout, "",log.LstdFlags)
+
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s", user, password, dbname, host, port)
+
+	var err error
+	a.DB, err = sql.Open("postgres", dsn)
+	if err != nil {
+		a.Logger.Fatal(err)
+	}
 	a.Router = mux.NewRouter()
 	a.Router.HandleFunc("/health",a.healthStatus).Methods("GET")
 
