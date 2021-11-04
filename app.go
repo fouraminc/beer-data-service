@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -17,11 +16,11 @@ type App struct {
 	Logger *log.Logger
 }
 
-func (a *App) InitializeDB(user, password, dbname, host, port string) {
+func (a *App) InitializeDB(user, password, dbname, host, port, sslmode string) {
 
 	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
-	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s", user, password, dbname, host, port)
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", user, password, dbname, host, port, sslmode)
 
 	var err error
 	a.DB, err = sql.Open("postgres", dsn)
@@ -35,6 +34,11 @@ func (a *App) InitializeRouter() {
 	a.Router = mux.NewRouter()
 
 	a.Router.HandleFunc("/health", a.healthStatus).Methods("GET")
+	a.Router.HandleFunc("/beers", a.getBeers).Methods("GET")
+	a.Router.HandleFunc("/beer/{id:[0-9]+}", a.getBeer).Methods("GET")
+	//a.Router.HandleFunc("/beer{id:[0-9]+}", a.getBeer).Methods("GET")
+	a.Router.HandleFunc("/beer", a.createBeer).Methods("POST")
+
 }
 
 func (a *App) Run(addr string) {
@@ -42,17 +46,5 @@ func (a *App) Run(addr string) {
 	loggerRouter := a.createLoggingRouter(a.Logger.Writer())
 
 	a.Logger.Fatal(http.ListenAndServe(addr, loggerRouter))
-
-}
-
-func (a *App) healthStatus(writer http.ResponseWriter, request *http.Request) {
-
-	response, _ := json.Marshal(struct {
-		Status string `json:"status"`
-	}{"OK"})
-
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
 
 }
