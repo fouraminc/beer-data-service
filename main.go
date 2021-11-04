@@ -1,17 +1,18 @@
 package main
 
-
 var (
-	dbUser = "postgres"
+	dbUser     = "postgres"
 	dbPassword = "postgres"
-	dbName = "beerdb"
-	dbHost = "localhost"
-	dbPort = "5432"
+	dbName     = "beerdb"
+	dbHost     = "localhost"
+	dbPort     = "5432"
 )
+
 func main() {
 
 	a := App{}
 
-	a.Initialize(dbUser,dbPassword,dbName,dbHost,dbPort)
+	a.InitializeDB(dbUser, dbPassword, dbName, dbHost, dbPort)
+	a.InitializeRouter()
 	a.Run(":8080")
 }

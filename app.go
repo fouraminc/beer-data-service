@@ -12,15 +12,14 @@ import (
 )
 
 type App struct {
-
 	Router *mux.Router
-	DB *sql.DB
+	DB     *sql.DB
 	Logger *log.Logger
 }
 
-func (a *App) Initialize(user, password, dbname, host, port string) {
+func (a *App) InitializeDB(user, password, dbname, host, port string) {
 
-	a.Logger = log.New(os.Stdout, "",log.LstdFlags)
+	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s", user, password, dbname, host, port)
 
@@ -29,9 +28,13 @@ func (a *App) Initialize(user, password, dbname, host, port string) {
 	if err != nil {
 		a.Logger.Fatal(err)
 	}
-	a.Router = mux.NewRouter()
-	a.Router.HandleFunc("/health",a.healthStatus).Methods("GET")
 
+}
+
+func (a *App) InitializeRouter() {
+	a.Router = mux.NewRouter()
+
+	a.Router.HandleFunc("/health", a.healthStatus).Methods("GET")
 }
 
 func (a *App) Run(addr string) {
@@ -44,10 +47,12 @@ func (a *App) Run(addr string) {
 
 func (a *App) healthStatus(writer http.ResponseWriter, request *http.Request) {
 
-	response, _ := json.Marshal(struct{Status string`json:"status"`}{"OK"})
+	response, _ := json.Marshal(struct {
+		Status string `json:"status"`
+	}{"OK"})
 
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(response)
-	
+
 }
