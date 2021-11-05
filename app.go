@@ -36,6 +36,7 @@ func (a *App) InitializeRouter() {
 	a.Router.HandleFunc("/health", a.healthStatus).Methods("GET")
 	a.Router.HandleFunc("/beers", a.getBeers).Methods("GET")
 	a.Router.HandleFunc("/beer/{id:[0-9]+}", a.getBeer).Methods("GET")
+	a.Router.HandleFunc("/beer", a.getBeer).Methods("GET").Queries("id", "{id:[0-9]+}")
 	//a.Router.HandleFunc("/beer{id:[0-9]+}", a.getBeer).Methods("GET")
 	a.Router.HandleFunc("/beer", a.createBeer).Methods("POST")
 
