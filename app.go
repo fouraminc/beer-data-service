@@ -33,11 +33,19 @@ func (a *App) InitializeDB(user, password, dbname, host, port, sslmode string) {
 func (a *App) InitializeRouter() {
 	a.Router = mux.NewRouter()
 
+	// Am I up
 	a.Router.HandleFunc("/health", a.healthStatus).Methods("GET")
+
+	// Get all beers
 	a.Router.HandleFunc("/beers", a.getBeers).Methods("GET")
+
+	// handle path variables
 	a.Router.HandleFunc("/beer/{id:[0-9]+}", a.getBeer).Methods("GET")
+	// handle query parameters
+
 	a.Router.HandleFunc("/beer", a.getBeer).Methods("GET").Queries("id", "{id:[0-9]+}")
-	//a.Router.HandleFunc("/beer{id:[0-9]+}", a.getBeer).Methods("GET")
+
+	// beer me
 	a.Router.HandleFunc("/beer", a.createBeer).Methods("POST")
 
 }
