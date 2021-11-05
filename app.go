@@ -41,12 +41,20 @@ func (a *App) InitializeRouter() {
 
 	// handle path variables
 	a.Router.HandleFunc("/beer/{id:[0-9]+}", a.getBeer).Methods("GET")
+
 	// handle query parameters
 
 	a.Router.HandleFunc("/beer", a.getBeer).Methods("GET").Queries("id", "{id:[0-9]+}")
 
 	// beer me
 	a.Router.HandleFunc("/beer", a.createBeer).Methods("POST")
+
+	// remove beer, how sad, path variables
+	a.Router.HandleFunc("/beer/{id:[0-9]+}", a.deleteBeer).Methods("DELETE")
+
+	// remove beer, still sad, query variables
+	a.Router.HandleFunc("/beer", a.deleteBeer).Methods("DELETE").Queries("id", "{id:[0-9]+}")
+
 
 }
 

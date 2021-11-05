@@ -13,6 +13,7 @@ const (
 	createBeerQuery = "INSERT INTO beer (name, description) VALUES($1, $2) RETURNING beer_id"
 	getBeerQuery = "SELECT name, description FROM beer WHERE beer_id = $1"
 	getBeersQuery = "SELECT beer_id, name, description from beer"
+	deleteBeerQuery = "DELETE from beer where beer_id = $1"
 )
 
 func (b *beer) getBeer(db *sql.DB) error {
@@ -47,4 +48,14 @@ func getBeers(db *sql.DB) ([]beer, error) {
 	}
 	return beers, nil
 
+}
+
+func (b *beer) deleteBeer(db *sql.DB) error {
+
+	_, err := db.Exec(deleteBeerQuery, b.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

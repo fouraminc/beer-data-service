@@ -92,3 +92,32 @@ func (a *App) getBeer(w http.ResponseWriter, r *http.Request) {
 
 	a.respondWithJSON(w, http.StatusOK, b)
 }
+
+
+func (a *App) deleteBeer(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("In deleteBeer")
+
+	args := mux.Vars(r)
+
+	id, err := strconv.Atoi(args["id"])
+	if err != nil {
+		a.respondWithError(w, http.StatusBadRequest, "Invalid argument" + err.Error())
+	}
+
+	b := beer{ID :id}
+
+	if err := b.deleteBeer(a.DB); err != nil {
+		fmt.Println("Maybe and error" + err.Error())
+		switch err {
+
+		// maybe overkill here?
+		case sql.ErrNoRows:
+			a.respondWithError(w, http.StatusNotFound, "Beer not found")
+
+		default:
+			a.respondWithError(w, http.StatusInternalServerError, "Something went wrong"+ err.Error())
+		}
+		return
+	}
+	return
+}
