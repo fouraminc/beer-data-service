@@ -55,6 +55,9 @@ func (a *App) InitializeRouter() {
 	// remove beer, still sad, query variables
 	a.Router.HandleFunc("/beer", a.deleteBeer).Methods("DELETE").Queries("id", "{id:[0-9]+}")
 
+	// update the beer, everyone likes a new twist
+	a.Router.HandleFunc("/beer/{id:[0-9]+}", a.updateBeer).Methods("PUT")
+
 
 }
 
@@ -65,3 +68,4 @@ func (a *App) Run(addr string) {
 	a.Logger.Fatal(http.ListenAndServe(addr, loggerRouter))
 
 }
+

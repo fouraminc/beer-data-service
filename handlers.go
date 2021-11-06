@@ -69,7 +69,7 @@ func (a *App) getBeers(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) getBeer(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("In getBeer")
+	a.Logger.Println("In getBeer")
 	args := mux.Vars(r)
 	id, err := strconv.Atoi(args["id"])
 	if err != nil {
@@ -95,7 +95,7 @@ func (a *App) getBeer(w http.ResponseWriter, r *http.Request) {
 
 
 func (a *App) deleteBeer(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("In deleteBeer")
+	a.Logger.Println("DeleteBeer: Started")
 
 	args := mux.Vars(r)
 
@@ -107,9 +107,7 @@ func (a *App) deleteBeer(w http.ResponseWriter, r *http.Request) {
 	b := beer{ID :id}
 
 	if err := b.deleteBeer(a.DB); err != nil {
-		fmt.Println("Maybe and error" + err.Error())
 		switch err {
-
 		// maybe overkill here?
 		case sql.ErrNoRows:
 			a.respondWithError(w, http.StatusNotFound, "Beer not found")
@@ -120,4 +118,32 @@ func (a *App) deleteBeer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	return
+}
+
+func (a *App) updateBeer(w http.ResponseWriter, r *http.Request) {
+	var b beer
+
+	args := mux.Vars(r)
+	id, err := strconv.Atoi(args["id"])
+
+	if err != nil {
+		a.respondWithError(w, http.StatusAccepted, "Invalid argument" + err.Error())
+	}
+
+	b.ID = id
+
+	decoder := json.NewDecoder(r.Body)
+
+	if err:= decoder.Decode(&b); err != nil {
+		a.respondWithError(w, http.StatusBadRequest, "Invalid request payload" + err.Error())
+		return
+	}
+	defer r.Body.Close()
+
+	if err := b.updateBeer(a.DB); err != nil {
+		a.respondWithError(w, http.StatusInternalServerError, "Problem updating beer" + err.Error())
+		return
+	}
+
+	a.respondWithJSON(w, http.StatusOK, b)
 }
