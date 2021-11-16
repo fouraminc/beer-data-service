@@ -1,0 +1,6 @@
+dbUser : postgres
+dbPassword : postgres
+dbName : beerdb
+dbHost : 192.168.86.38
+dbPort : 5432
+sslMode : disable
