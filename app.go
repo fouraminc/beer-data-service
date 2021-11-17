@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
@@ -15,50 +14,23 @@ type App struct {
 	Router *mux.Router
 	DB     *sql.DB
 	Logger *log.Logger
-	Config
+	DBConfig
 }
 
-type Config struct {
-	dbUser     string
-	dbPassword string
-	dbName     string
-	dbHost     string
-	dbPort     string
-	sslMode    string
-}
-
-func (a *App) InitializeConfig() {
-	config := Config{}
-
-	vi := viper.New()
-	vi.SetConfigFile("config.yaml")
-	vi.ReadInConfig()
-
-	config.dbUser = vi.GetString("dbUser")
-	config.dbPassword = vi.GetString("dbPassword")
-	config.sslMode = vi.GetString("sslMode")
-	config.dbName = vi.GetString("dbName")
-	config.dbHost = vi.GetString("dbHost")
-	config.dbPort = vi.GetString("dbPort")
-	a.Config = config
-
-}
 
 func (a *App) InitializeDB() {
 
-	fmt.Println("App Config:")
-	fmt.Println(a.Config)
 	a.Logger = log.New(os.Stdout, "", log.LstdFlags)
 
-	fmt.Println(a.Config.dbHost)
+	fmt.Println(a.DBConfig.dbHost)
 
 	dsn := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
-		a.Config.dbUser,
-		a.Config.dbPassword,
-		a.Config.dbHost,
-		a.Config.dbPort,
-		a.Config.dbName,
-		a.Config.sslMode)
+		a.DBConfig.dbUser,
+		a.DBConfig.dbPassword,
+		a.DBConfig.dbHost,
+		a.DBConfig.dbPort,
+		a.DBConfig.dbName,
+		a.DBConfig.sslMode)
 	a.Logger.Println(dsn)
 	var err error
 	a.DB, err = sql.Open("postgres", dsn)
